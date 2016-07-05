@@ -119,3 +119,8 @@ xstc/Makefile
 xstc/Makefile.in
 xstc/Tests
 xstc/xsts-*.tar.gz
+build/
+*.VC.opendb
+*.user
+*.VC.db
+.vs/
