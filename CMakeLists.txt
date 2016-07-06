@@ -37,16 +37,34 @@ option(WITH_LEGACY "Enable deprecated api's" OFF)
 option(WITH_OUTPUT "Enable serialization support" ON)
 option(WITH_PYTHON "Enable Python bindings" OFF)
 
-if(WITH_ICONV)
-  find_package(iconv REQUIRED NO_MODULE)
-endif()
 
 set(libxml2_VERSION 2.9.4)
+
+include(CheckIncludeFile)
+include(CheckFunctionExists)
+
+CHECK_INCLUDE_FILE(ctype.h HAVE_CTYPE_H)
+CHECK_INCLUDE_FILE(dirent.h HAVE_DIRENT_H)
+CHECK_INCLUDE_FILE(dlfcn.h HAVEN_DLFCN_H)
+CHECK_INCLUDE_FILE(dl.h HAVE_DL_H)
+CHECK_INCLUDE_FILE(errno.h HAVE_ERRNO_H)
+CHECK_INCLUDE_FILE(fcntl.h HAVE_FCNTL_H)
+CHECK_INCLUDE_FILE(ieeefp.h HAVE_IEEEP_H)
+CHECK_INCLUDE_FILE(inttypes.h HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILE(limits.h HAVE_LIMITS_H)
+CHECK_INCLUDE_FILE(malloc.h HAVE_MALLOC_H)
+CHECK_INCLUDE_FILE(math.h HAVE_MATH_H)
+CHECK_INCLUDE_FILE(memory.h HAVE_MEMORY_H)
+
 
 if(MSVC)
   set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
+configure_file(
+  config.h.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/config.h
+)
 
 add_library(libxml2 
   xzlib.h
@@ -86,9 +104,6 @@ add_library(libxml2
   pattern.c
   relaxng.c
   rngparser.c
-  runsuite.c
-  runtest.c
-  runxmlconf.c
   SAX.c
   SAX2.c
   schematron.c
@@ -101,9 +116,7 @@ add_library(libxml2
   valid.c
   xinclude.c
   xlink.c
-  xmlcatalog.c
   xmlIO.c
-  xmllint.c
   xmlmemory.c
   xmlmodule.c
   xmlreader.c
@@ -123,6 +136,14 @@ target_include_directories(
   INTERFACE
   $<INSTALL_INTERFACE:include/libxml2>
 )
+target_compile_definitions(libxml2 
+  PRIVATE 
+  _CRT_SECURE_NO_WARNINGS
+  _CRT_STDC_NO_DEPRECATE)
+if(WITH_ICONV)
+  find_package(iconv REQUIRED NO_MODULE)
+  target_link_libraries(libxml2 PRIVATE iconv::iconv)
+endif()
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
