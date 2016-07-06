@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(libxml2 LANGUAGES C)
 
+option(BUILD_SHARED_LIBS "Build as shared lib instead of static" ON)
 option(WITH_TRIO "Enable TRIO string manipulator" ON)
 option(WITH_THREADS:STRING "Enable thread safety [no|ctls|native|posix" "native")
 option(WITH_FTP "Enable FTP client" OFF)
@@ -140,6 +141,11 @@ target_compile_definitions(libxml2
   PRIVATE 
   _CRT_SECURE_NO_WARNINGS
   _CRT_STDC_NO_DEPRECATE)
+
+if(BUILD_SHARED_LIBS AND MSVC)
+  target_link_libraries(libxml2 PRIVATE ws2_32.lib)
+endif()
+
 if(WITH_ICONV)
   find_package(iconv REQUIRED NO_MODULE)
   target_link_libraries(libxml2 PRIVATE iconv::iconv)
@@ -159,8 +165,8 @@ install(TARGETS libxml2 EXPORT libxml2
 
 
 install(DIRECTORY
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/libxml2
-  DESTINATION include/libxml2)
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/libxml
+  DESTINATION include/libxml)
 
 install(EXPORT libxml2
   FILE
@@ -177,3 +183,10 @@ install(
   DESTINATION
     lib/cmake/libxml2
 )
+
+if(MSVC)
+  install(FILES
+    $<TARGET_PDB_FILE:libxml2>
+    DESTINATION lib
+  )
+endif()
