@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(libxml2 LANGUAGES C)
+project(libxml2 VERSION 2.9.4 LANGUAGES C)
 
 option(BUILD_SHARED_LIBS "Build as shared lib instead of static" ON)
 option(WITH_TRIO "Enable TRIO string manipulator" ON)
@@ -39,8 +39,6 @@ option(WITH_OUTPUT "Enable serialization support" ON)
 option(WITH_PYTHON "Enable Python bindings" OFF)
 
 
-set(libxml2_VERSION 2.9.4)
-
 include(CheckIncludeFile)
 include(CheckFunctionExists)
 
@@ -58,7 +56,7 @@ CHECK_INCLUDE_FILE(math.h HAVE_MATH_H)
 CHECK_INCLUDE_FILE(memory.h HAVE_MEMORY_H)
 
 
-if(MSVC)
+if(WIN32)
   set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
@@ -135,7 +133,7 @@ target_include_directories(
   libxml2 PRIVATE
   $<BUILD_INTERFACE:.;include;include/libxml2>
   INTERFACE
-  $<INSTALL_INTERFACE:include/libxml2>
+  $<INSTALL_INTERFACE:include/libxml>
 )
 target_compile_definitions(libxml2 
   PRIVATE 
@@ -154,7 +152,7 @@ endif()
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/libxml2-config-version.cmake
-  VERSION ${libxml2_VERSION}
+  VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
@@ -166,7 +164,7 @@ install(TARGETS libxml2 EXPORT libxml2
 
 install(DIRECTORY
   ${CMAKE_CURRENT_SOURCE_DIR}/include/libxml
-  DESTINATION include/libxml)
+  DESTINATION include)
 
 install(EXPORT libxml2
   FILE
@@ -182,6 +180,11 @@ install(
     ${CMAKE_CURRENT_BINARY_DIR}/libxml2-config-version.cmake
   DESTINATION
     lib/cmake/libxml2
+)
+
+export(TARGETS libxml2
+  FILE libxml2.cmake
+  NAMESPACE libxml2::
 )
 
 if(MSVC)
