@@ -131,9 +131,9 @@ add_library(libxml2
 )
 target_include_directories(
   libxml2 PRIVATE
-  $<BUILD_INTERFACE:.;include;include/libxml2>
+  $<BUILD_INTERFACE:.;include;include/libxml>
   INTERFACE
-  $<INSTALL_INTERFACE:include/libxml>
+  $<INSTALL_INTERFACE:include>
 )
 target_compile_definitions(libxml2 
   PRIVATE 
@@ -145,7 +145,7 @@ if(BUILD_SHARED_LIBS AND MSVC)
 endif()
 
 if(WITH_ICONV)
-  find_package(iconv REQUIRED NO_MODULE)
+  find_package(iconv 1.14 REQUIRED NO_MODULE)
   target_link_libraries(libxml2 PRIVATE iconv::iconv)
 endif()
 
@@ -164,7 +164,8 @@ install(TARGETS libxml2 EXPORT libxml2
 
 install(DIRECTORY
   ${CMAKE_CURRENT_SOURCE_DIR}/include/libxml
-  DESTINATION include)
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
 
 install(EXPORT libxml2
   FILE
