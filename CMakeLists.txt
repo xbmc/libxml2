@@ -64,8 +64,7 @@ configure_file(
   config.h.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/config.h
 )
-
-add_library(libxml2 
+add_library(${PROJECT_NAME} 
   xzlib.h
   buf.h
   config.h
@@ -129,11 +128,14 @@ add_library(libxml2
   xpath.c
   xpointer.c
 )
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(
   libxml2 PRIVATE
   $<BUILD_INTERFACE:.;include;include/libxml>
   INTERFACE
   $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/libxml>
 )
 target_compile_definitions(libxml2 
   PRIVATE 
@@ -145,7 +147,9 @@ if(BUILD_SHARED_LIBS AND MSVC)
 endif()
 
 if(WITH_ICONV)
-  find_package(iconv 1.14 REQUIRED NO_MODULE)
+  if(!UNIFIED_BUILD)
+    find_package(iconv 1.14 REQUIRED NO_MODULE)
+  endif()
   target_link_libraries(libxml2 PRIVATE iconv::iconv)
 endif()
 
