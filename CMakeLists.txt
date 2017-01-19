@@ -70,9 +70,15 @@ if(WIN32)
 endif()
 
 configure_file(
-  config.h.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/config.h
+  include/libxml/xmlversion.h.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/libxml/xmlversion.h
 )
+
+configure_file(
+  config.h.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.h
+)
+
 add_library(${PROJECT_NAME} 
   xzlib.h
   buf.h
